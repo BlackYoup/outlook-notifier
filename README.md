@@ -1,0 +1,1 @@
+## Outlook notifier for Firefox
