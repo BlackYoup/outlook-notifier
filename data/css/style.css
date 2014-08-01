@@ -1,10 +1,10 @@
 @-moz-document url("chrome://browser/content/browser.xul") {
   #outlook-notifier-btn[cui-areatype="menu-panel"],
   toolbarpaletteitem[place="palette"] > #outlook-notifier-btn {
-    list-style-image: url("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/outlook-32.png");
+    list-style-image: url("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/img/outlook-32.png");
   }
   #outlook-notifier-btn {
-    list-style-image: url("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/outlook-16.png");
+    list-style-image: url("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/img/outlook-16.png");
   }
   #outlook-notifier-btn:after {
     position: relative;
