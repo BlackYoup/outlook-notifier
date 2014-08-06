@@ -26,6 +26,9 @@
   #outlook-notifier-btn[value="..."]:after {
     margin: 8px 0px 0px -15px !important;
   }
+  #outlook-notifier-btn[valueLength="0"]:after {
+    display: none;
+  }
   #outlook-notifier-btn[valueLength="1"]:after {
     margin: 8px 0px 0px -12px;
   }
