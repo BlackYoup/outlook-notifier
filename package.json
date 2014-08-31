@@ -5,6 +5,13 @@
   "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail",
   "author": "Lefebvre Arnaud",
   "license": "MPL 2.0",
-  "version": "0.1.2",
-  "icon": "./data/img/outlook-32.png"
+  "version": "0.2.0",
+  "icon": "./data/img/outlook-32.png",
+  "preferences": [{
+    "name": "refresh_schedule",
+    "title": "Refresh schedule",
+    "description": "How often the addon checks for mails (in seconds)",
+    "type": "integer",
+    "value": 60
+  }]
 }
