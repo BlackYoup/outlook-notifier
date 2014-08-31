@@ -5,7 +5,7 @@
   "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail",
   "author": "Lefebvre Arnaud",
   "license": "MPL 2.0",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "icon": "./data/img/outlook-32.png",
   "preferences": [
       {
