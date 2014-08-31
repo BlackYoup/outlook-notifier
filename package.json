@@ -7,11 +7,20 @@
   "license": "MPL 2.0",
   "version": "0.2.0",
   "icon": "./data/img/outlook-32.png",
-  "preferences": [{
-    "name": "refresh_schedule",
-    "title": "Refresh schedule",
-    "description": "How often the addon checks for mails (in seconds)",
-    "type": "integer",
-    "value": 60
-  }]
+  "preferences": [
+      {
+        "name": "refresh_schedule",
+        "title": "Refresh schedule",
+        "description": "How often the addon checks for mails (in seconds)",
+        "type": "integer",
+        "value": 60
+      },
+      {
+        "name": "show_changelog",
+        "title": "Show changelog",
+        "description": "Show changelog in a new tab when addon just got updated",
+        "type": "bool",
+        "value": true
+      }
+  ]
 }
