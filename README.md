@@ -20,6 +20,10 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.4.2 (2/08/14)
+
++ Delete useless librarie
+
 #### v0.4.1 (2/08/14)
 
 + Fix button click not opening [Outlook.com](https://outlook.com) when not signed in
