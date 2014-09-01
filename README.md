@@ -20,6 +20,10 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.4.1 (2/08/14)
+
++ Fix button click not opening [Outlook.com](https://outlook.com) when not signed in
+
 #### v0.4.0 (2/08/14)
 
 + Add a quick menu to refresh mails or access settings
