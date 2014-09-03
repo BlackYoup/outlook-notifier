@@ -20,9 +20,13 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.5.0 (3/08/14)
+
++ If outlook.com is already opened in a tab, focus this tab
+
 #### v0.4.2 (2/08/14)
 
-+ Delete useless librarie
++ Delete useless library
 
 #### v0.4.1 (2/08/14)
 
