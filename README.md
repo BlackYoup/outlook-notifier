@@ -20,6 +20,10 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.6.0 (7/08/14)
+
++ Instant update of mails count when a manual action (i.e reading an unread mail) changes it
+
 #### v0.5.0 (3/08/14)
 
 + If outlook.com is already opened in a tab, focus this tab
