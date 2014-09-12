@@ -21,6 +21,13 @@
         "description": "Show changelog in a new tab when addon just got updated",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "display_notifications",
+        "title": "Display desktop notifications",
+        "description": "A desktop popup will display informations about unread messages. This may not work on some Operating Systems",
+        "type": "bool",
+        "value": true
       }
   ]
 }
