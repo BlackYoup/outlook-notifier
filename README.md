@@ -8,17 +8,22 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 + Auto fetch
 + Set how often the module will fetch for new mails
++ Instant updates when you're changing the counter (i.e reading a mail)
++ Customizable settings
++ Notifications
 
 ### TODO
 
-+ Add notifications
-+ Play a sound when new mails are received
 + Multi languages (at least English and French)
 + Don't only check inbox but also other folders if specified (when your mails are automaticaly filtered to a specific folder)
 + Read / answer mails without going to [Outlook.com](https://outlook.com)
 + and a bunch of other features
 
 ### Changelog
+
+#### v0.7.0 (15/08/14)
+
++ Add notifications when new mail is received. It shows the mail's subject and play a sound
 
 #### v0.6.0 (7/08/14)
 
