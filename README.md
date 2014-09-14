@@ -21,6 +21,10 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.7.1 (15/08/14)
+
++ Update email count as soon as the script is injected (issue #9)
+
 #### v0.7.0 (15/08/14)
 
 + Add notifications when new mail is received. It shows the mail's subject and play a sound
