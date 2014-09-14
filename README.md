@@ -21,6 +21,10 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.7.2 (15/08/14)
+
++ Add a preference to either play or not a sound on a notification
+
 #### v0.7.1 (15/08/14)
 
 + Update email count as soon as the script is injected (issue #9)
