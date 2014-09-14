@@ -28,6 +28,13 @@
         "description": "A desktop popup will display informations about unread messages. This may not work on some Operating Systems",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "play_notification_sound",
+        "title": "Play a sound for notifications",
+        "description": "Play or not a sound when a notification pop up",
+        "type": "bool",
+        "value": true
       }
   ]
 }
