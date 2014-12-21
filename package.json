@@ -8,33 +8,33 @@
   "version": "0.7.4",
   "icon": "./data/img/outlook-32.png",
   "preferences": [
-      {
-        "name": "refresh_schedule",
-        "title": "Refresh schedule",
-        "description": "How often the addon checks for mails (in seconds)",
-        "type": "integer",
-        "value": 60
-      },
-      {
-        "name": "show_changelog",
-        "title": "Show changelog",
-        "description": "Show changelog in a new tab when addon just got updated",
-        "type": "bool",
-        "value": true
-      },
-      {
-        "name": "display_notifications",
-        "title": "Display desktop notifications",
-        "description": "A desktop popup will display informations about unread messages. This may not work on some Operating Systems",
-        "type": "bool",
-        "value": true
-      },
-      {
-        "name": "play_notification_sound",
-        "title": "Play a sound for notifications",
-        "description": "Play or not a sound when a notification pop up",
-        "type": "bool",
-        "value": true
-      }
+    {
+      "name": "refresh_schedule",
+      "title": "Refresh schedule",
+      "description": "How often the addon checks for mails (in seconds)",
+      "type": "integer",
+      "value": 60
+    },
+    {
+      "name": "show_changelog",
+      "title": "Show changelog",
+      "description": "Show changelog in a new tab when addon just got updated",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "display_notifications",
+      "title": "Display desktop notifications",
+      "description": "A desktop popup will display informations about unread messages. This may not work on some Operating Systems",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "play_notification_sound",
+      "title": "Play a sound for notifications",
+      "description": "Play or not a sound when a notification pop up",
+      "type": "bool",
+      "value": true
+    },
   ]
 }
