@@ -16,6 +16,13 @@
       "value": 60
     },
     {
+      "name": "start_delay",
+      "title": "Start delay",
+      "description": "How much seconds the extension will wait to fetch messages after firefox's load",
+      "type": "integer",
+      "value": 5
+    },
+    {
       "name": "show_changelog",
       "title": "Show changelog",
       "description": "Show changelog in a new tab when addon just got updated",
@@ -35,6 +42,6 @@
       "description": "Play or not a sound when a notification pop up",
       "type": "bool",
       "value": true
-    },
+    }
   ]
 }
