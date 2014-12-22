@@ -42,6 +42,13 @@
       "description": "Play or not a sound when a notification pop up",
       "type": "bool",
       "value": true
+    },
+    {
+      "name": "reset_counter_click",
+      "title": "Reset counter at icon click",
+      "description": "If you click the icon, counter will be reset to 0 and show a new counter for new upcoming emails",
+      "type": "bool",
+      "value": false
     }
   ]
 }
