@@ -21,6 +21,20 @@ This module allows you to have a quick check on your [Outlook.com](https://outlo
 
 ### Changelog
 
+#### v0.8.1
+
++ Minor improvements about changelog
+
+#### v0.8.0
+
++ Add an option to fetch emails after a certain time. Usefull if you don't want the application to start fetching at firefox's startup
++ Add an option to "Reset counter when you click the icon and just show how much unread email you've got since"
++ Some module rewrite with better logic
+
+#### v0.7.4
+
++ Some minor internal changes (librarys, fixes)
+
 #### v0.7.2 (15/08/14)
 
 + Add a preference to either play or not a sound on a notification
