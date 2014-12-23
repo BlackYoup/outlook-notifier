@@ -4,7 +4,7 @@ module.exports = function(grunt){
   grunt.initConfig({
     watch: {
       files: ['app/lib/*.js', 'app/package.json'],
-      tasks: ['exec:deleteConf', 'exec:addConf', 'exec:build', 'exec:install'],
+      tasks: ['exec:deleteConf', 'exec:createConfDir', 'exec:addConf', 'exec:build', 'exec:install'],
       options: {
         atBegin: true
       }
@@ -13,6 +13,10 @@ module.exports = function(grunt){
       deleteConf: {
         cmd: 'rm ./app/lib/conf/conf.js',
         exitCode: [0, 1]
+      },
+      createConfDir: {
+        cmd: 'mkdir ./app/lib/conf',
+        exitCode: [0 ,1]
       },
       addConf: {
         cmd: 'cp ' + confFile + ' ./app/lib/conf/conf.js'
