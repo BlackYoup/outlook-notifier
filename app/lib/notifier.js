@@ -1,5 +1,5 @@
 var Request = require('sdk/request').Request,
-  {Cc, Ci, Cu} = require('chrome'),
+  {Cc, Ci} = require('chrome'),
   DOMParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser),
   timers = require('sdk/timers'),
   app = require('sdk/self'),
@@ -7,6 +7,7 @@ var Request = require('sdk/request').Request,
   storage = require('./storage'),
   utils = require('./utils'),
   ui = require('./ui'),
+  conf = require('./conf/conf.js'),
   Mail = require('./mail.js'),
   _ = require('./vendor/lodash.min.js');
 
@@ -15,7 +16,7 @@ module.exports = function(){
 
   this.interval = null;
   this.logged = null;
-  this.url = 'https://dub131.mail.live.com/default.aspx';
+  this.url = conf.outlookUrl;
   this.oldEmails = [];
   this.resetedMails = [];
 
@@ -29,7 +30,7 @@ module.exports = function(){
             ui.drawIcons('0');
             self.resetedMails = self.resetedMails.concat(self.oldEmails);
           }
-          ui.open('https://mail.live.com', 'outlook', injectScript);
+          ui.open(conf.outlookUrl, 'outlook', injectScript);
         }
       break;
       default:
@@ -40,10 +41,12 @@ module.exports = function(){
 
   this.loop = function(){
     timers.clearInterval(this.interval);
+    var refreshSchedule = conf.refreshSchedule !== null ? conf.refreshSchedule : preferences.get('refresh_schedule');
+
     this.fetch();
     this.interval = timers.setInterval(function(){
       self.fetch();
-    }, preferences.get('refresh_schedule') * 1000);
+    }, refreshSchedule * 1000);
   };
 
   this.fetch = function(){
@@ -205,10 +208,11 @@ module.exports = function(){
 
   this.init = function(){
     ui.init(this);
+    var startDelay = conf.startDelay !== null ? conf.startDelay : preferences.get('start_delay');
     timers.setTimeout(function(){
       self.listenPrefsChange();
       self.loop();
       self.checkNewVersion();
-    }, preferences.get('start_delay') * 1000);
+    }, startDelay * 1000);
   };
 };

@@ -1,54 +1,33 @@
 {
+  "license": "GPL v3",
   "name": "outlook-notifier",
-  "title": "outlook-notifier",
-  "id": "jid1-uZHilmjZSvXUug",
-  "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail",
+  "repository": {
+    "url": "https://github.com/BlackYoup/outlook-notifier.git",
+    "type": "git"
+  },
   "author": "Lefebvre Arnaud",
-  "license": "MPL 2.0",
+  "bugs": {
+    "url": "https://github.com/BlackYoup/outlook-notifier/issues"
+  },
   "version": "0.8.1",
-  "icon": "./data/img/outlook-32.png",
-  "preferences": [
-    {
-      "name": "refresh_schedule",
-      "title": "Refresh schedule",
-      "description": "How often the addon checks for mails (in seconds)",
-      "type": "integer",
-      "value": 60
-    },
-    {
-      "name": "start_delay",
-      "title": "Start delay",
-      "description": "How much seconds the extension will wait to fetch messages after firefox's load",
-      "type": "integer",
-      "value": 5
-    },
-    {
-      "name": "show_changelog",
-      "title": "Show changelog",
-      "description": "Show changelog in a new tab when addon just got updated",
-      "type": "bool",
-      "value": true
-    },
-    {
-      "name": "display_notifications",
-      "title": "Display desktop notifications",
-      "description": "A desktop popup will display informations about unread messages. This may not work on some Operating Systems",
-      "type": "bool",
-      "value": true
-    },
-    {
-      "name": "play_notification_sound",
-      "title": "Play a sound for notifications",
-      "description": "Play or not a sound when a notification pop up",
-      "type": "bool",
-      "value": true
-    },
-    {
-      "name": "reset_counter_click",
-      "title": "Reset counter at icon click",
-      "description": "If you click the icon, counter will be reset to 0 and show a new counter for new upcoming emails",
-      "type": "bool",
-      "value": false
-    }
-  ]
+  "dependencies": {
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-cli": "^0.1.13",
+    "grunt": "^0.4.5",
+    "grunt-exec": "^0.4.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "outlook",
+    "notifier",
+    "addons",
+    "firefox"
+  ],
+  "devDependencies": {},
+  "main": "Gruntfile.js",
+  "homepage": "https://github.com/BlackYoup/outlook-notifier", 
+  "id": "jid1-Hv8686VEVK02ZQ",
+  "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail"
 }

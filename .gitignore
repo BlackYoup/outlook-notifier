@@ -1,3 +1,2 @@
 node_modules/
-Gruntfile.js
-*.less
+app/lib/conf

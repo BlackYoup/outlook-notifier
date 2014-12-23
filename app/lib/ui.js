@@ -4,6 +4,7 @@ var app = require('sdk/self'),
   notifications = require('sdk/notifications'),
   _ = require('./vendor/lodash.min.js'),
   preferences = require('./preferences'),
+  conf = require('./conf/conf.js'),
   notifier = null;
 
 Cu.import('resource:///modules/CustomizableUI.jsm');
@@ -197,7 +198,7 @@ function UI(){
 
     if(!options.onClick){
       options.onClick = function(){
-        self.open('https://mail.live.com', 'outlook', true);
+        self.open(conf.outlookUrl, 'outlook', true);
       };
     }
 
