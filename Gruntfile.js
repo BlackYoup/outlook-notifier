@@ -22,10 +22,10 @@ module.exports = function(grunt){
         cmd: 'cp ' + confFile + ' ./app/lib/conf/conf.js'
       },
       build: {
-        cmd: 'cd ./app/bin/ && /usr/bin/python2.7 /usr/bin/cfx xpi ../',
+        cmd: 'cd ./app/ && /usr/bin/python2.7 /usr/bin/cfx xpi',
       },
       install: {
-        cmd: 'wget --post-file=./app/bin/outlook-notifier.xpi http://127.0.0.1:8888/',
+        cmd: 'wget --post-file=./app/outlook-notifier.xpi http://127.0.0.1:8888/',
         exitCode: [0, 8]
       }
     }
