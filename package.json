@@ -27,7 +27,7 @@
   ],
   "devDependencies": {},
   "main": "Gruntfile.js",
-  "homepage": "https://github.com/BlackYoup/outlook-notifier", 
+  "homepage": "https://github.com/BlackYoup/outlook-notifier",
   "id": "jid1-Hv8686VEVK02ZQ",
   "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail"
 }
