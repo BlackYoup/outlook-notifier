@@ -1,8 +1,8 @@
 {
   "name": "outlook-notifier",
-  "title": "outlook-notifier",
+  "title": "Outlook Notifier",
   "id": "jid1-uZHilmjZSvXUug",
-  "description": "A plugin for firefox to display how much unread messages you have in your outlook webmail",
+  "description": "Displays how much unread messages you have in your outlook webmail",
   "author": "Lefebvre Arnaud",
   "license": "MPL 2.0",
   "version": "0.8.2",
