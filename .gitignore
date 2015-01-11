@@ -1,3 +1,4 @@
 node_modules/
 app/lib/conf
 app/*.xpi
+*.zip

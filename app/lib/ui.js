@@ -69,6 +69,7 @@ function UI(){
     this.addChild(menuPopup, item, { label: 'Refresh' }, notifier.fetch.bind(notifier));
     menuPopup.appendChild(menuSeparator.cloneNode(true));
     this.addChild(menuPopup, item, { label: 'Settings' }, this.showSettings);
+    this.addChild(menuPopup, item, { label: 'Log out'}, notifier.logout.bind(notifier));
 
     return menuPopup;
   };

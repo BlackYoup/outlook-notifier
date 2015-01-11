@@ -1,6 +1,7 @@
 module.exports = function(grunt){
   var confFile = process.env.ENVIRONMENT && process.env.ENVIRONMENT === 'DEV' ? './conf/dev.js' : './conf/prod.js';
 
+  grunt.log.write('Building for ' + (process.env.ENVIRONMENT || 'PROD') + ' environment');
   grunt.initConfig({
     watch: {
       files: ['app/lib/*.js', 'app/package.json'],
@@ -34,5 +35,6 @@ module.exports = function(grunt){
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-exec');
 
+  grunt.registerTask('build', ['exec:addConf', 'exec:build']);
   grunt.registerTask('default', ['watch']);
 };

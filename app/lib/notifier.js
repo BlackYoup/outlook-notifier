@@ -206,6 +206,14 @@ module.exports = function(){
     }
   };
 
+  this.logout = function(){
+    ui.drawIcons('...');
+    Request({
+      url: 'https://login.live.com/logout.srf',
+      onComplete: this.fetch.bind(this)
+    }).get();
+  };
+
   this.init = function(){
     ui.init(this);
     var startDelay = conf.startDelay !== null ? conf.startDelay : preferences.get('start_delay');
