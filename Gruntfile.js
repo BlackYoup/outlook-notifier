@@ -4,7 +4,7 @@ module.exports = function(grunt){
   grunt.log.write('Building for ' + (process.env.ENVIRONMENT || 'PROD') + ' environment');
   grunt.initConfig({
     watch: {
-      files: ['app/lib/*.js', 'app/package.json'],
+      files: ['app/lib/*.js', 'app/data/css/*', 'app/package.json'],
       tasks: ['exec:deleteConf', 'exec:createConfDir', 'exec:addConf', 'exec:build', 'exec:install'],
       options: {
         atBegin: true
