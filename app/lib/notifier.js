@@ -58,11 +58,11 @@ module.exports = function(){
 
   this.parseRes = function(res){
     let document = DOMParser.parseFromString(res.text, 'text/html'),
-      div = document.querySelector('.count'),
+      counters = document.querySelectorAll('span.Unread span.count'),
       messageNbr = null,
       unreadMails = [];
 
-    if(this.checkLogged(div)){
+    if(this.checkLogged(document)){
       unreadMails = this.getUnreadMails(document);
       if(unreadMails.length <= 0){
         this.resetedMails = [];
@@ -72,7 +72,13 @@ module.exports = function(){
         let unResetedMails = this.computeUnResetedMails(unreadMails);
         messageNbr = unResetedMails.length;
       } else{
-        messageNbr = unreadMails.length;
+        messageNbr = _.map(counters, function(counter){
+          return parseInt(counter.innerHTML.trim());
+        }).filter(function(counter){
+          return !isNaN(counter);
+        }).reduce(function(total, counter){
+          return total += counter;
+        }, 0);
       }
     } else{
       messageNbr = '?';
@@ -138,8 +144,8 @@ module.exports = function(){
     return unreadMails;
   };
 
-  this.checkLogged = function(div){
-    this.logged = div !== null;
+  this.checkLogged = function(document){
+    this.logged = document.querySelector('.c_search_box') !== null;
     return this.logged;
   };
 
