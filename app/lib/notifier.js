@@ -1,4 +1,4 @@
-var Request = require('sdk/request').Request,
+let Request = require('sdk/request').Request,
   {Cc, Ci} = require('chrome'),
   DOMParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser),
   timers = require('sdk/timers'),
@@ -12,7 +12,7 @@ var Request = require('sdk/request').Request,
   _ = require('./vendor/lodash.min.js');
 
 module.exports = function(){
-  var self = this;
+  let self = this;
 
   this.interval = null;
   this.logged = null;
@@ -24,7 +24,7 @@ module.exports = function(){
     switch(e.button){
       case 0:
         if(e.target.id === 'outlook-notifier-btn'){
-          var injectScript = true;
+          let injectScript = true;
           if(preferences.get('reset_counter_click') === true){
             injectScript = false;
             ui.drawIcons('0');
@@ -41,7 +41,7 @@ module.exports = function(){
 
   this.loop = function(){
     timers.clearInterval(this.interval);
-    var refreshSchedule = conf.refreshSchedule !== null ? conf.refreshSchedule : preferences.get('refresh_schedule');
+    let refreshSchedule = conf.refreshSchedule !== null ? conf.refreshSchedule : preferences.get('refresh_schedule');
 
     this.fetch();
     this.interval = timers.setInterval(function(){
@@ -57,7 +57,7 @@ module.exports = function(){
   };
 
   this.parseRes = function(res){
-    var document = DOMParser.parseFromString(res.text, 'text/html'),
+    let document = DOMParser.parseFromString(res.text, 'text/html'),
       div = document.querySelector('.count'),
       messageNbr = null,
       unreadMails = [];
@@ -69,10 +69,9 @@ module.exports = function(){
         this.oldEmails = [];
       }
       if(preferences.get('reset_counter_click') === true){
-        var unResetedMails = this.computeUnResetedMails(unreadMails);
+        let unResetedMails = this.computeUnResetedMails(unreadMails);
         messageNbr = unResetedMails.length;
       } else{
-        var tempMessageNbr = div.innerHTML.trim();
         messageNbr = unreadMails.length;
       }
     } else{
@@ -82,7 +81,7 @@ module.exports = function(){
     ui.drawIcons(messageNbr);
 
     if(preferences.get('display_notifications') === true && parseInt(messageNbr) > 0 && unreadMails.length > 0){
-      var nonNotifiedEmails = this.getNonNotifiedMails(unreadMails);
+      let nonNotifiedEmails = this.getNonNotifiedMails(unreadMails);
       if(nonNotifiedEmails.length > 0){
         ui.displayNotification({
           title: 'New mails (' + nonNotifiedEmails.length + ')',
@@ -96,7 +95,7 @@ module.exports = function(){
   };
 
   this.getNonNotifiedMails = function(unreadMails){
-    var ret = null;
+    let ret = null;
     if(this.oldEmails.length > 0){
       ret = _.reject(unreadMails, function(mail){
         return _.find(self.oldEmails, function(old){
@@ -110,23 +109,23 @@ module.exports = function(){
   };
 
   this.computeUnResetedMails = function(unreadMails){
-    var resetedIDs = _.pluck(this.resetedMails, 'id');
+    let resetedIDs = _.pluck(this.resetedMails, 'id');
     return _.reject(unreadMails, function(mail){
       return _.contains(resetedIDs, mail.id);
     });
   };
 
   this.getUnreadMails = function(document){
-    var mailsTables = document.querySelectorAll('ul.mailList.InboxTableBody'),
+    let mailsTables = document.querySelectorAll('ul.mailList.InboxTableBody'),
     mailsTablesChilds = _.map(mailsTables, function(table){
       return table.children;
     }),
     mailsIDs = [],
     mailStrings = [];
 
-    var unreadMails = _.flatten(_.map(mailsTablesChilds, function(nodeList){
-      var mails = _.filter(nodeList, function(elem){
-        var classes = elem.className.split(' ');
+    let unreadMails = _.flatten(_.map(mailsTablesChilds, function(nodeList){
+      let mails = _.filter(nodeList, function(elem){
+        let classes = elem.className.split(' ');
 
         return _.some(classes, function(className){
           return className === 'mlUnrd';
@@ -149,7 +148,7 @@ module.exports = function(){
   };
 
   this.onScheduleTimeChange = function(){
-    var newSchedule = preferences.get('refresh_schedule');
+    let newSchedule = preferences.get('refresh_schedule');
     if(parseInt(newSchedule) === 0){
       preferences.set('refresh_schedule', 1);
     }
@@ -157,9 +156,9 @@ module.exports = function(){
   };
 
   this.checkNewVersion = function(){
-    var showChangelog = preferences.get('show_changelog');
+    let showChangelog = preferences.get('show_changelog');
     if(showChangelog === true){
-      var actualVersion = utils.splitVersion(app.version),
+      let actualVersion = utils.splitVersion(app.version),
       savedVersion = utils.splitVersion(storage.get('saved_version'));
 
       if(savedVersion && utils.checkVersions(actualVersion, savedVersion) === 'updated'){
@@ -175,14 +174,14 @@ module.exports = function(){
       return;
     }
 
-    var updateCounter = function(){
+    let updateCounter = function(){
       self.postMessage({
         type: 'countUpdate',
         value: div.textContent.trim()
       });
     };
 
-    var div = document.querySelector('.count'),
+    let div = document.querySelector('.count'),
     config = {
       childList: true
     },
@@ -216,7 +215,7 @@ module.exports = function(){
 
   this.init = function(){
     ui.init(this);
-    var startDelay = conf.startDelay !== null ? conf.startDelay : preferences.get('start_delay');
+    let startDelay = conf.startDelay !== null ? conf.startDelay : preferences.get('start_delay');
     timers.setTimeout(function(){
       self.listenPrefsChange();
       self.loop();

@@ -1,4 +1,4 @@
-var storage = require('sdk/simple-storage').storage;
+let storage = require('sdk/simple-storage').storage;
 
 function Storage(){
   this.get = function(key){

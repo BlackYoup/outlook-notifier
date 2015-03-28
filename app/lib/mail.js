@@ -1,5 +1,5 @@
 function Mail(mail){
-  var self = this;
+  let self = this;
 
   this.id = mail.id;
   this.rawSubject = null;

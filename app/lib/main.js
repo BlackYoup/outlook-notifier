@@ -1,2 +1,2 @@
-var Notifier = require('./notifier.js');
+let Notifier = require('./notifier.js');
 new Notifier().init();

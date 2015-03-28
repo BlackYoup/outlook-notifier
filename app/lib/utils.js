@@ -1,11 +1,11 @@
-var tabs = require('sdk/tabs');
+let tabs = require('sdk/tabs');
 
-var splitVersion = function(version){
+let splitVersion = function(version){
   if(!version){
     return null;
   }
-  var obj = version.split('.');
-  var versionObj = {
+  let obj = version.split('.');
+  let versionObj = {
     major: parseInt(obj[0]),
     minor: parseInt(obj[1]),
     bugFix: parseInt(obj[2])
@@ -14,8 +14,8 @@ var splitVersion = function(version){
   return versionObj;
 };
 
-var checkVersions = function(current, saved){
-  var isUpdated = false;
+let checkVersions = function(current, saved){
+  let isUpdated = false;
 
   if(current.major > saved.major || current.minor > saved.minor || current.bugFix > saved.bugFix){
     isUpdated = true;
@@ -24,8 +24,8 @@ var checkVersions = function(current, saved){
   return isUpdated ? 'updated' : 'not_updated';
 };
 
-var showChangeLog = function(version){
-  var currentversionAnchor = '#v' + version.replace(/\./g, '');
+let showChangeLog = function(version){
+  let currentversionAnchor = '#v' + version.replace(/\./g, '');
   tabs.open('https://blackyoup.github.io/outlook-notifier/' + currentversionAnchor);
 };
 

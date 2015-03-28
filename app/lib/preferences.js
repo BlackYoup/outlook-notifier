@@ -1,4 +1,4 @@
-var preferences = require('sdk/simple-prefs'),
+let preferences = require('sdk/simple-prefs'),
   prefs = preferences.prefs;
 
 function Preferences(){

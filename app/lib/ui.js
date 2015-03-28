@@ -1,4 +1,4 @@
-var app = require('sdk/self'),
+let app = require('sdk/self'),
   {Cc, Ci, Cu} = require('chrome'),
   tabs = require('sdk/tabs'),
   notifications = require('sdk/notifications'),
@@ -11,7 +11,7 @@ Cu.import('resource:///modules/CustomizableUI.jsm');
 Cu.import('resource://gre/modules/Services.jsm');
 
 function UI(){
-  var self = this;
+  let self = this;
 
   let io = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService),
     appButton = null;
@@ -75,7 +75,7 @@ function UI(){
   };
 
   this.addChild = function(menuPopup, item, data, command){
-    var item_ = item.cloneNode(true);
+    let item_ = item.cloneNode(true);
     item_.setAttribute('label', data.label);
     item_.setAttribute('value', data.value);
     menuPopup.appendChild(item_);
@@ -88,8 +88,8 @@ function UI(){
   };
 
   this.drawIcons = function(text){
-    var strText = text.toString().trim();
-    var intText = !isNaN(parseInt(strText)) ? parseInt(strText) : undefined;
+    let strText = text.toString().trim();
+    let intText = !isNaN(parseInt(strText)) ? parseInt(strText) : undefined;
 
     if(typeof intText !== 'undefined'){
       if(intText > 9999){
@@ -100,7 +100,7 @@ function UI(){
     }
 
     appButton.instances.forEach(function(instance){
-      var elem = instance.anchor.ownerDocument.defaultView.document.getElementById('outlook-notifier-btn');
+      let elem = instance.anchor.ownerDocument.defaultView.document.getElementById('outlook-notifier-btn');
       elem.setAttribute('value', strText);
       elem.setAttribute('valueLength', strText.length);
 
@@ -123,7 +123,7 @@ function UI(){
   };
 
   this.open = function(url, name, injectScript){
-    var tabID = this.tabs[name];
+    let tabID = this.tabs[name];
     if(tabID){
       if(this.tabExists(tabID)){
         this.focusTab(tabID);
@@ -156,7 +156,7 @@ function UI(){
   };
 
   this.focusTab = function(tabID){
-    for each(var tab_ in tabs){
+    for each(let tab_ in tabs){
       if(tab_.id === tabID){
         tab_.activate();
         break;
@@ -169,7 +169,7 @@ function UI(){
   };
 
   this.tabExists = function(ID){
-    var found = false;
+    let found = false;
 
     for each(tab in tabs){
       if(tab.url == notifier.url){
@@ -211,9 +211,9 @@ function UI(){
   };
 
   this.playSound = function(){
-    var ios = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService);
-    var sound = ios.newURI("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/sound/notification.wav", null, null);
-    var player = Cc["@mozilla.org/sound;1"].createInstance(Ci.nsISound);
+    let ios = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService);
+    let sound = ios.newURI("resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/sound/notification.wav", null, null);
+    let player = Cc["@mozilla.org/sound;1"].createInstance(Ci.nsISound);
 
     player.play(sound);
   };
