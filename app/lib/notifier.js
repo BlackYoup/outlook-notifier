@@ -27,7 +27,7 @@ module.exports = function(){
           let injectScript = true;
           if(preferences.get('reset_counter_click') === true){
             injectScript = false;
-            ui.drawIcons('0');
+            ui.drawIcons(0);
             self.resetedMails = self.resetedMails.concat(self.oldEmails);
           }
           ui.open(conf.outlookUrl, 'outlook', injectScript);
@@ -81,7 +81,7 @@ module.exports = function(){
         }, 0);
       }
     } else{
-      messageNbr = '?';
+      messageNbr = -1;
     }
 
     ui.drawIcons(messageNbr);
@@ -203,7 +203,10 @@ module.exports = function(){
   this.onInjectedScriptMessage = function(message){
     switch(message.type){
       case 'countUpdate':
-        ui.drawIcons(message.value);
+        let value = parseInt(message.value);
+        if(!isNaN(value)){
+          ui.drawIcons(value);
+        }
       break;
       default:
         console.log('No action for this injected message');
@@ -212,7 +215,6 @@ module.exports = function(){
   };
 
   this.logout = function(){
-    ui.drawIcons('...');
     Request({
       url: 'https://login.live.com/logout.srf',
       onComplete: this.fetch.bind(this)

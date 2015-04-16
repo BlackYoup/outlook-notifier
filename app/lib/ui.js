@@ -87,16 +87,17 @@ function UI(){
     menuPopup.openPopup(node, "after_end", 0, 0, false);
   };
 
-  this.drawIcons = function(text){
-    let strText = text.toString().trim();
-    let intText = !isNaN(parseInt(strText)) ? parseInt(strText) : undefined;
+  this.drawIcons = function(value){
+    let strText;
 
-    if(typeof intText !== 'undefined'){
-      if(intText > 9999){
-        strText = '9999';
-      } else if(intText <= 0){
-        strText = '';
-      }
+    if(value > 9999){
+      strText = '9999';
+    } else if(value === 0){
+      strText = '';
+    } else if(value < 0){
+      strText = '?';
+    } else{
+      strText = value.toString();
     }
 
     appButton.instances.forEach(function(instance){
