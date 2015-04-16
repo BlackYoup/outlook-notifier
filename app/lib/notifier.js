@@ -61,14 +61,22 @@ module.exports = function(){
 
   this.parseRes = function(res){
     let document = DOMParser.parseFromString(res.text, 'text/html');
+    let dontNotifyTheseCategories = preferences.get('ignore_folders').split(',');
+
     let categories = _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(categories, categorie){
       let name = categorie.querySelector('span.editableLabel').innerHTML.trim();
-      categories[name] = {
-        counter: categorie.querySelector('span.count').innerHTML.trim(),
-        name: name
-      };
+      let dontKeepCategorie = _.find(dontNotifyTheseCategories, function(n){
+        return name === n.trim();
+      });
+      if(!dontKeepCategorie){
+        categories[name] = {
+          counter: categorie.querySelector('span.count').innerHTML.trim(),
+          name: name
+        };
+      }
       return categories;
     }, {});
+
     let messageNbr = null;
     let unreadMails = [];
     this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
