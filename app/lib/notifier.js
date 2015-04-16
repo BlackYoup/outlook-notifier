@@ -224,31 +224,29 @@ module.exports = function(){
 
     let updateCounter = function(){
       self.postMessage({
-        type: 'countUpdate',
-        value: div.textContent.trim()
+        type: 'countUpdate'
       });
     };
 
-    let div = document.querySelector('.count'),
-    config = {
-      childList: true
-    },
-    observer = new MutationObserver(updateCounter);
-
-    observer.observe(div, config);
-    window.onbeforeunload = function(){
-      observer.disconnect();
-    };
+    let counters = document.querySelectorAll('.count');
+    for(var i = 0, j = counters.length; i < j; i++){
+      let div = counters[i];
+      let config = {
+        childList: true
+      };
+      let observer = new MutationObserver(updateCounter);
+      observer.observe(div, config);
+      window.onbeforeunload = function(){
+        observer.disconnect();
+      };
+    }
     updateCounter();
   };
 
   this.onInjectedScriptMessage = function(message){
     switch(message.type){
       case 'countUpdate':
-        let value = parseInt(message.value);
-        if(!isNaN(value)){
-          ui.drawIcons(value);
-        }
+        self.fetch.call(self);
       break;
       default:
         console.log('No action for this injected message');
