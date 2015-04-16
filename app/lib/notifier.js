@@ -17,8 +17,11 @@ module.exports = function(){
   this.interval = null;
   this.logged = null;
   this.url = conf.outlookUrl;
+  this.oldCategories = [];
   this.oldEmails = [];
   this.resetedMails = [];
+  this.firstCheck = true;
+  this.inboxName = null;
 
   this.buttonClick = function(e){
     switch(e.button){
@@ -57,10 +60,18 @@ module.exports = function(){
   };
 
   this.parseRes = function(res){
-    let document = DOMParser.parseFromString(res.text, 'text/html'),
-      counters = document.querySelectorAll('span.Unread span.count'),
-      messageNbr = null,
-      unreadMails = [];
+    let document = DOMParser.parseFromString(res.text, 'text/html');
+    let categories = _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(categories, categorie){
+      let name = categorie.querySelector('span.editableLabel').innerHTML.trim();
+      categories[name] = {
+        counter: categorie.querySelector('span.count').innerHTML.trim(),
+        name: name
+      };
+      return categories;
+    }, {});
+    let messageNbr = null;
+    let unreadMails = [];
+    this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
 
     if(this.checkLogged(document)){
       unreadMails = this.getUnreadMails(document);
@@ -72,8 +83,8 @@ module.exports = function(){
         let unResetedMails = this.computeUnResetedMails(unreadMails);
         messageNbr = unResetedMails.length;
       } else{
-        messageNbr = _.map(counters, function(counter){
-          return parseInt(counter.innerHTML.trim());
+        messageNbr = _.map(categories, function(categorie){
+          return parseInt(categorie.counter);
         }).filter(function(counter){
           return !isNaN(counter);
         }).reduce(function(total, counter){
@@ -87,17 +98,48 @@ module.exports = function(){
     ui.drawIcons(messageNbr);
 
     if(preferences.get('display_notifications') === true && parseInt(messageNbr) > 0 && unreadMails.length > 0){
-      let nonNotifiedEmails = this.getNonNotifiedMails(unreadMails);
-      if(nonNotifiedEmails.length > 0){
-        ui.displayNotification({
-          title: 'New mails (' + nonNotifiedEmails.length + ')',
-          text: _.pluck(nonNotifiedEmails, 'subject')
+      if(this.firstCheck){
+        this.firstCheck = false;
+        if(messageNbr > 0){
+          ui.displayNotification({
+            title: 'Unread mails: ' + messageNbr,
+            text: _.reduce(categories, function(subject, categorie){
+              return subject += categorie.name + ': ' + categorie.counter.toString() + '\n\r';
+            }, '')
+          });
+        }
+      } else{
+        // Emails in inbox
+        let nonNotifiedInboxEmails = this.getNonNotifiedMails(unreadMails);
+        // Emails in other folders
+        let nonNotifiedFoldersEmails = _.filter(categories, function(c){
+          return (!self.oldCategories[c.name] || self.oldCategories[c.name].counter < c.counter) && c.name !== self.inboxName;
+        }).map(function(c){
+          return {
+            counter: c.counter - (self.oldCategories[c.name] ? self.oldCategories[c.name].counter : 0),
+            name: c.name
+          };
         });
+
+        if(nonNotifiedInboxEmails.length > 0){
+          ui.displayNotification({
+            title: 'New mails in Inbox',
+            text: _.pluck(nonNotifiedInboxEmails, 'subject')
+          });
+        }
+        if(nonNotifiedFoldersEmails.length > 0){
+          nonNotifiedFoldersEmails.forEach(function(c){
+            ui.displayNotification({
+              title: 'New mails (' + c.counter + ') in ' + c.name
+            });
+          });
+        }
       }
     }
     if(unreadMails.length > 0){
       this.oldEmails = unreadMails;
     }
+    this.oldCategories = categories;
   };
 
   this.getNonNotifiedMails = function(unreadMails){
