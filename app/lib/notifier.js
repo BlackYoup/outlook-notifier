@@ -119,6 +119,8 @@ module.exports = function(){
             counter: c.counter - (self.oldCategories[c.name] ? self.oldCategories[c.name].counter : 0),
             name: c.name
           };
+        }).filter(function(c){
+          return c.counter > 0;
         });
 
         if(nonNotifiedInboxEmails.length > 0){
