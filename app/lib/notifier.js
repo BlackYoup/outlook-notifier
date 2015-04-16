@@ -18,8 +18,7 @@ module.exports = function(){
   this.logged = null;
   this.url = conf.outlookUrl;
   this.oldCategories = [];
-  this.oldEmails = [];
-  this.resetedMails = [];
+  this.oldInboxEmails = [];
   this.firstCheck = true;
   this.inboxName = null;
 
@@ -28,11 +27,6 @@ module.exports = function(){
       case 0:
         if(e.target.id === 'outlook-notifier-btn'){
           let injectScript = true;
-          if(preferences.get('reset_counter_click') === true){
-            injectScript = false;
-            ui.drawIcons(0);
-            self.resetedMails = self.resetedMails.concat(self.oldEmails);
-          }
           ui.open(conf.outlookUrl, 'outlook', injectScript);
         }
       break;
@@ -78,36 +72,28 @@ module.exports = function(){
     }, {});
 
     let messageNbr = null;
-    let unreadMails = [];
+    let unreadInboxMails = this.getUnreadInboxMails(document);
     this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
 
     if(this.checkLogged(document)){
-      unreadMails = this.getUnreadMails(document);
-      if(unreadMails.length <= 0){
-        this.resetedMails = [];
-        this.oldEmails = [];
+      if(unreadInboxMails.length <= 0){
+        this.oldInboxEmails = [];
       }
-      if(preferences.get('reset_counter_click') === true){
-        let unResetedMails = this.computeUnResetedMails(unreadMails);
-        messageNbr = unResetedMails.length;
-      } else{
-        messageNbr = _.map(categories, function(categorie){
-          return parseInt(categorie.counter);
-        }).filter(function(counter){
-          return !isNaN(counter);
-        }).reduce(function(total, counter){
-          return total += counter;
-        }, 0);
-      }
+      messageNbr = _.map(categories, function(categorie){
+        return parseInt(categorie.counter);
+      }).filter(function(counter){
+        return !isNaN(counter);
+      }).reduce(function(total, counter){
+        return total += counter;
+      }, 0);
     } else{
       messageNbr = -1;
     }
 
     ui.drawIcons(messageNbr);
 
-    if(preferences.get('display_notifications') === true && parseInt(messageNbr) > 0 && unreadMails.length > 0){
+    if(preferences.get('display_notifications') === true && parseInt(messageNbr) > 0){
       if(this.firstCheck){
-        this.firstCheck = false;
         if(messageNbr > 0){
           ui.displayNotification({
             title: 'Unread mails: ' + messageNbr,
@@ -118,7 +104,7 @@ module.exports = function(){
         }
       } else{
         // Emails in inbox
-        let nonNotifiedInboxEmails = this.getNonNotifiedMails(unreadMails);
+        let nonNotifiedInboxEmails = this.getNonNotifiedMails(unreadInboxMails);
         // Emails in other folders
         let nonNotifiedFoldersEmails = _.filter(categories, function(c){
           return (!self.oldCategories[c.name] || self.oldCategories[c.name].counter < c.counter) && c.name !== self.inboxName;
@@ -146,34 +132,29 @@ module.exports = function(){
         }
       }
     }
-    if(unreadMails.length > 0){
-      this.oldEmails = unreadMails;
+    if(unreadInboxMails.length > 0){
+      this.oldInboxEmails = unreadInboxMails;
     }
+
     this.oldCategories = categories;
+    this.firstCheck = false;
   };
 
-  this.getNonNotifiedMails = function(unreadMails){
+  this.getNonNotifiedMails = function(unreadInboxMails){
     let ret = null;
-    if(this.oldEmails.length > 0){
-      ret = _.reject(unreadMails, function(mail){
-        return _.find(self.oldEmails, function(old){
+    if(this.oldInboxEmails.length > 0){
+      ret = _.reject(unreadInboxMails, function(mail){
+        return _.find(self.oldInboxEmails, function(old){
           return old.id === mail.id;
         });
       });
     } else{
-      ret = unreadMails;
+      ret = unreadInboxMails;
     }
     return ret;
   };
 
-  this.computeUnResetedMails = function(unreadMails){
-    let resetedIDs = _.pluck(this.resetedMails, 'id');
-    return _.reject(unreadMails, function(mail){
-      return _.contains(resetedIDs, mail.id);
-    });
-  };
-
-  this.getUnreadMails = function(document){
+  this.getUnreadInboxMails = function(document){
     let mailsTables = document.querySelectorAll('ul.mailList.InboxTableBody'),
     mailsTablesChilds = _.map(mailsTables, function(table){
       return table.children;
@@ -181,7 +162,7 @@ module.exports = function(){
     mailsIDs = [],
     mailStrings = [];
 
-    let unreadMails = _.flatten(_.map(mailsTablesChilds, function(nodeList){
+    let unreadInboxMails = _.flatten(_.map(mailsTablesChilds, function(nodeList){
       let mails = _.filter(nodeList, function(elem){
         let classes = elem.className.split(' ');
 
@@ -193,7 +174,7 @@ module.exports = function(){
         return new Mail(mail).init();
       });
     }));
-    return unreadMails;
+    return unreadInboxMails;
   };
 
   this.checkLogged = function(document){

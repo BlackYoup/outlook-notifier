@@ -44,13 +44,6 @@
       "value": true
     },
     {
-      "name": "reset_counter_click",
-      "title": "Reset counter at icon click",
-      "description": "If you click the icon, counter will be reset to 0 and show a new counter for new upcoming emails",
-      "type": "bool",
-      "value": false
-    },
-    {
       "name": "ignore_folders",
       "title": "Ignore folders for received mails",
       "description": "Specify for what folders you don't want to be notified (case sensitive and comma separated: my Folder 1, folder2, fôlder3)",
