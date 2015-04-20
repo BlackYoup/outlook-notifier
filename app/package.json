@@ -5,7 +5,7 @@
   "description": "Displays how much unread messages you have in your outlook webmail",
   "author": "Lefebvre Arnaud",
   "license": "GPL v3",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "icon": "./data/img/outlook-32.png",
   "preferences": [
     {
