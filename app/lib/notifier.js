@@ -55,6 +55,12 @@ module.exports = function(){
 
   this.parseRes = function(res){
     let document = DOMParser.parseFromString(res.text, 'text/html');
+
+    if(!this.checkLogged(document)){
+      ui.drawIcons(-1);
+      return;
+    }
+
     let dontNotifyTheseCategories = preferences.get('ignore_folders').split(',');
 
     let categories = _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(categories, categorie){
@@ -71,24 +77,20 @@ module.exports = function(){
       return categories;
     }, {});
 
-    let messageNbr = null;
     let unreadInboxMails = this.getUnreadInboxMails(document);
     this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
 
-    if(this.checkLogged(document)){
-      if(unreadInboxMails.length <= 0){
-        this.oldInboxEmails = [];
-      }
-      messageNbr = _.map(categories, function(categorie){
-        return parseInt(categorie.counter);
-      }).filter(function(counter){
-        return !isNaN(counter);
-      }).reduce(function(total, counter){
-        return total += counter;
-      }, 0);
-    } else{
-      messageNbr = -1;
+    if(unreadInboxMails.length <= 0){
+      this.oldInboxEmails = [];
     }
+
+    let messageNbr = _.map(categories, function(categorie){
+      return parseInt(categorie.counter);
+    }).filter(function(counter){
+      return !isNaN(counter);
+    }).reduce(function(total, counter){
+      return total += counter;
+    }, 0);
 
     ui.drawIcons(messageNbr);
 
