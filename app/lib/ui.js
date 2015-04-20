@@ -2,89 +2,37 @@ let app = require('sdk/self'),
   {Cc, Ci, Cu} = require('chrome'),
   tabs = require('sdk/tabs'),
   notifications = require('sdk/notifications'),
+  { ActionButton } = require('sdk/ui/button/action'),
   _ = require('./vendor/lodash.min.js'),
   preferences = require('./preferences'),
   conf = require('./conf/conf.js'),
   notifier = null;
 
-Cu.import('resource:///modules/CustomizableUI.jsm');
 Cu.import('resource://gre/modules/Services.jsm');
 
 function UI(){
-  let self = this;
+  const defaultIcons = {
+    '16': './img/outlook-16.png',
+    '32': './img/outlook-32.png',
+    '64': './img/outlook-64.png',
+  };
 
-  let io = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService),
-    appButton = null;
+  let self = this;
+  let appButton = null;
 
   this.buttonID = 'outlook-notifier-btn';
   this.checkText = '...';
   this.defaultToolTip = 'Click to open Outlook.com in a new tab';
-  this._ss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
-  this._uri = io.newURI(app.data.url('css/style.css'), null, null);
   this.tabs = {};
 
   this.createButton = function(){
-    CustomizableUI.destroyWidget('outlook-notifier-btn');
-
-    CustomizableUI.addListener({
-      onWidgetBeforeDOMChange: function(node, nextNode, container, getRemoved){
-        if(node.id !== self.buttonID){
-          return;
-        }
-
-        node.addEventListener('click', notifier.buttonClick, true);
-
-        let menuPopup = self.buildContextMenu(node);
-        node.appendChild(menuPopup);
-
-        node.addEventListener('contextmenu', function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          self.showContextMenu(menuPopup, node);
-        });
-      }
-    });
-
-    appButton = CustomizableUI.createWidget({
+    appButton = ActionButton({
       id: this.buttonID,
-      defaultArea: CustomizableUI.AREA_NAVBAR,
-      label: 'Outlook notifier',
-      tooltiptext: this.defaultToolTip
+      label: self.defaultToolTip,
+      icon: defaultIcons,
+      onClick: notifier.buttonClick,
+      badgeColor: '#235BCD'
     });
-
-    if(this._ss.sheetRegistered(this._uri, this._ss.USER_SHEET)) {
-      this._ss.unregisterSheet(this._uri, this._ss.USER_SHEET);
-    }
-    this._ss.loadAndRegisterSheet(this._uri, this._ss.USER_SHEET);
-  };
-
-  this.buildContextMenu = function(node){
-    const NS_XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-    let doc = node.ownerDocument.defaultView.document,
-    menuPopup = doc.createElementNS(NS_XUL, 'menupopup'),
-    menu = doc.createElementNS(NS_XUL, 'menu'),
-    menuSeparator = doc.createElementNS(NS_XUL, 'menuseparator'),
-    item = doc.createElementNS(NS_XUL, 'menuitem');
-
-    this.addChild(menuPopup, item, { label: 'Refresh' }, notifier.fetch.bind(notifier));
-    menuPopup.appendChild(menuSeparator.cloneNode(true));
-    this.addChild(menuPopup, item, { label: 'Settings' }, this.showSettings);
-    this.addChild(menuPopup, item, { label: 'Log out'}, notifier.logout.bind(notifier));
-
-    return menuPopup;
-  };
-
-  this.addChild = function(menuPopup, item, data, command){
-    let item_ = item.cloneNode(true);
-    item_.setAttribute('label', data.label);
-    item_.setAttribute('value', data.value);
-    menuPopup.appendChild(item_);
-    item_.addEventListener('command', command);
-    return item_;
-  };
-
-  this.showContextMenu = function(menuPopup, node){
-    menuPopup.openPopup(node, "after_end", 0, 0, false);
   };
 
   this.drawIcons = function(value){
@@ -100,23 +48,19 @@ function UI(){
       strText = value.toString();
     }
 
-    appButton.instances.forEach(function(instance){
-      let elem = instance.anchor.ownerDocument.defaultView.document.getElementById('outlook-notifier-btn');
-      elem.setAttribute('value', strText);
-      elem.setAttribute('valueLength', strText.length);
+    appButton.badge = strText;
 
-      if(notifier.logged === false){
-        elem.style.listStyleImage = "url('resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/img/outlook-16-black-white.png')";
-        elem.setAttribute('tooltiptext', 'You are not logged in. Click to open Outlook.com and sign in !');
-      } else if(notifier.logged){
-        if(strText === ''){
-          elem.style.listStyleImage = "url('resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/img/outlook-16-black-white.png')";
-        } else{
-          elem.style.listStyleImage = "url('resource://jid1-uzhilmjzsvxuug-at-jetpack/outlook-notifier/data/img/outlook-16.png')";
-        }
-        elem.setAttribute('tooltiptext', self.defaultToolTip);
+    if(notifier.logged === false){
+      appButton.icon = './img/outlook-16-black-white.png';
+      appButton.label = 'You are not logged in. Click to open Outlook.com and sign in !';
+    } else if(notifier.logged){
+      if(strText === ''){
+        appButton.icon = './img/outlook-16-black-white.png';
+      } else{
+        appButton.icon = defaultIcons;
       }
-    });
+      appButton.label = self.defaultToolTip;
+    }
   };
 
   this.showSettings = function(){

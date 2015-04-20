@@ -23,17 +23,7 @@ module.exports = function(){
   this.inboxName = null;
 
   this.buttonClick = function(e){
-    switch(e.button){
-      case 0:
-        if(e.target.id === 'outlook-notifier-btn'){
-          let injectScript = true;
-          ui.open(conf.outlookUrl, 'outlook', injectScript);
-        }
-      break;
-      default:
-        console.log('no options for click : ' + e.button);
-      break;
-    }
+    ui.open(conf.outlookUrl, 'outlook', true);
   };
 
   this.loop = function(){
