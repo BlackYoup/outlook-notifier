@@ -23,7 +23,6 @@ function UI(){
   this.buttonID = 'outlook-notifier-btn';
   this.checkText = '...';
   this.defaultToolTip = 'Click to open Outlook.com in a new tab';
-  this.tabs = {};
 
   this.createButton = function(){
     appButton = ActionButton({
@@ -68,23 +67,13 @@ function UI(){
   };
 
   this.open = function(url, name, injectScript){
-    let tabID = this.tabs[name];
-    if(tabID){
-      if(this.tabExists(tabID)){
-        this.focusTab(tabID);
-      } else{
-        this.removeTab(name);
-        this.open(url, name, injectScript);
-      }
+    let alreadyOpened = this.tabExists();
+
+    if(alreadyOpened){
+      alreadyOpened.activate();
     } else{
       tabs.open({
         url: url,
-        onOpen: function(tab){
-          self.tabs[name] = tab.id;
-        },
-        onClose: function(tab){
-          self.removeTab(name);
-        },
         onPageShow: function(tab){
           if(injectScript){
             tab.attach({
@@ -100,38 +89,16 @@ function UI(){
     }
   };
 
-  this.focusTab = function(tabID){
-    for each(let tab_ in tabs){
-      if(tab_.id === tabID){
-        tab_.activate();
-        break;
-      }
-    }
-  };
+  this.tabExists = function(){
+    let found = null;
 
-  this.removeTab = function(name){
-    delete this.tabs[name];
-  };
-
-  this.tabExists = function(ID){
-    let found = false;
-
-    for each(tab in tabs){
-      if(tab.url == notifier.url){
-        found = true;
+    for each(let tab in tabs){
+      if(tab.title.match('Outlook.com - ')){
+        found = tab;
         break;
       }
     }
     return found;
-  };
-
-  this.lookForOpenedTabs = function(){
-    for each(tab in tabs){
-      if(tab.url == notifier.url){
-        this.tabs['outlook'] = tab.id;
-        break;
-      }
-    }
   };
 
   this.displayNotification = function(options){
@@ -166,7 +133,6 @@ function UI(){
   this.init = function(notifier_){
     notifier = notifier_;
     this.createButton();
-    this.lookForOpenedTabs();
   };
 }
 
