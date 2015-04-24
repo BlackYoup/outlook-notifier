@@ -9,7 +9,7 @@ let Request = require('sdk/request').Request,
   ui = require('./ui'),
   conf = require('./conf/conf.js'),
   Mail = require('./mail.js'),
-  _ = require('./vendor/lodash.min.js');
+  _ = require('./vendor/lodash/lodash.min.js');
 
 module.exports = function(){
   let self = this;

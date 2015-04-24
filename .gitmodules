@@ -1,0 +1,6 @@
+[submodule "app/lib/vendor/lodash"]
+	path = app/lib/vendor/lodash
+	url = https://github.com/lodash/lodash
+[submodule "app/lib/vendor/bacon.js"]
+	path = app/lib/vendor/bacon.js
+	url = https://github.com/baconjs/bacon.js/

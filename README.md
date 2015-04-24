@@ -28,6 +28,7 @@ Extension will be created under ./app/outlook-notifier.xpi
 You need [Node.js](https://nodejs.org/), [CFX](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Getting_started) and [AutoInstaller](https://addons.mozilla.org/addon/autoinstaller/) to have a continuous build of the addon
 
 ```
+  git clone --recursive git@github.com:BlackYoup/outlook-notifier.git
   npm install
   grunt
 
