@@ -6,6 +6,7 @@ let app = require('sdk/self'),
   _ = require('./vendor/lodash/lodash.min.js'),
   preferences = require('./preferences'),
   conf = require('./conf/conf.js'),
+  Bacon = require('./baconjs-wrapper.js'),
   notifier = null;
 
 Cu.import('resource://gre/modules/Services.jsm');

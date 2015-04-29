@@ -1,4 +1,4 @@
-let Request = require('sdk/request').Request,
+const Request = require('sdk/request').Request,
   {Cc, Ci} = require('chrome'),
   DOMParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser),
   timers = require('sdk/timers'),
@@ -9,150 +9,175 @@ let Request = require('sdk/request').Request,
   ui = require('./ui'),
   conf = require('./conf/conf.js'),
   Mail = require('./mail.js'),
-  _ = require('./vendor/lodash/lodash.min.js');
+  _ = require('./vendor/lodash/lodash.min.js'),
+  Bacon = require('./baconjs-wrapper.js');
 
 module.exports = function(){
-  let self = this;
+  const self = this;
+  const URL = conf.outlookUrl;
 
-  this.interval = null;
+  let b_oldInboxEmails = new Bacon.Bus();
+  let b_oldFolders = new Bacon.Bus();
+
+  let s_oldInboxEmails = b_oldInboxEmails.toProperty();
+  let s_oldFolders = b_oldFolders.toProperty();
+
   this.logged = null;
-  this.url = conf.outlookUrl;
-  this.oldCategories = [];
   this.oldInboxEmails = [];
-  this.firstCheck = true;
-  this.inboxName = null;
 
   this.buttonClick = function(e){
     ui.open(conf.outlookUrl, 'outlook', true);
   };
 
   this.loop = function(){
-    timers.clearInterval(this.interval);
-    let refreshSchedule = conf.refreshSchedule !== null ? conf.refreshSchedule : preferences.get('refresh_schedule');
+    const refreshSchedule = (conf.refreshSchedule !== null ? conf.refreshSchedule : preferences.get('refresh_schedule')) * 1000;
 
-    this.fetch();
-    this.interval = timers.setInterval(function(){
-      self.fetch();
-    }, refreshSchedule * 1000);
+    let s_document = Bacon
+      .repeat(() => Bacon.later(refreshSchedule).flatMapLatest(() => self.fetch(URL)))
+      .merge(self.fetch(URL))
+      .map(res => DOMParser.parseFromString(res.text, 'text/html'))
+      .flatMapLatest(function(document){
+        if(self.checkLogged(document)){
+          return Bacon.once(document);
+        } else{
+          ui.drawIcons(-1);
+          return new Bacon.End();
+        }
+      }).toProperty();
+
+    let s_messageNbr = s_document.map(document => self.getMessageNbr(document));
+    s_messageNbr.onValue(ui.drawIcons);
+
+    var s_displayNotifications = s_document
+      .filter(() => preferences.get('display_notifications') === true);
+
+    var s_folders = s_displayNotifications
+      .filter(s_messageNbr)
+      .map(self.getFolders);
+
+    var s_firstEvent = s_displayNotifications
+      .first()
+      .filter(s_messageNbr);
+
+    Bacon.onValues(s_firstEvent, s_messageNbr.first(), s_folders.first(), self.showFirstNotification);
+
+    var s_otherEvents = s_displayNotifications
+      .skip(1)
+      .sampledBy(s_messageNbr.filter(nbr => nbr > 0));
+
+    var s_unreadInboxEmails = s_otherEvents.map(self.getUnreadInboxMails);
+
+    var s_inboxName = s_otherEvents.map(document => document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim());
+
+    // Emails in Inbox
+    var s_nonNotifiedEmails = s_unreadInboxEmails.combine(s_oldInboxEmails, self.getNonNotifiedMails);
+    // Emails in other folders
+    var s_nonNotifiedFoldersEmails = Bacon.combineWith(self.getNonNotifiedFoldersEmails, s_folders, s_oldFolders, s_inboxName);
+
+    s_nonNotifiedEmails.filter('.length').onValue(self.showNonNotifiedInboxEmailsNotification);
+    s_nonNotifiedFoldersEmails.filter('.length').onValue(self.showNonNotifiedFoldersEmailsNotification);
+
+    // Now these streams are not needed anymore so we save their content for next loop
+    b_oldFolders.plug(s_folders.sampledBy(s_nonNotifiedFoldersEmails));
+    b_oldInboxEmails.plug(s_unreadInboxEmails.sampledBy(s_nonNotifiedEmails));
   };
 
-  this.fetch = function(){
-    Request({
-      url: this.url,
-      onComplete: this.parseRes.bind(this)
-    }).get();
+  this.fetch = function(url){
+    return Bacon.fromBinder(function(sink){
+      Request({
+        url: url,
+        onComplete: res => sink(res)
+      }).get();
+
+      return function(){};
+    });
   };
 
-  this.parseRes = function(res){
-    let document = DOMParser.parseFromString(res.text, 'text/html');
-
-    if(!this.checkLogged(document)){
-      ui.drawIcons(-1);
-      return;
-    }
-
-    let dontNotifyTheseCategories = preferences.get('ignore_folders').split(',');
-
-    let categories = _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(categories, categorie){
-      let name = categorie.querySelector('span.editableLabel').innerHTML.trim();
-      let dontKeepCategorie = _.find(dontNotifyTheseCategories, function(n){
-        return name === n.trim();
-      });
-      if(!dontKeepCategorie){
-        categories[name] = {
-          counter: categorie.querySelector('span.count').innerHTML.trim(),
-          name: name
-        };
-      }
-      return categories;
-    }, {});
-
-    let unreadInboxMails = this.getUnreadInboxMails(document);
-    this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
-
-    if(unreadInboxMails.length <= 0){
-      this.oldInboxEmails = [];
-    }
-
-    let messageNbr = _.map(categories, function(categorie){
-      return parseInt(categorie.counter);
+  this.getMessageNbr = function(document){
+    let folders = self.getFolders(document);
+    return _.map(folders, function(folder){
+      return parseInt(folder.counter);
     }).filter(function(counter){
       return !isNaN(counter);
     }).reduce(function(total, counter){
       return total += counter;
     }, 0);
-
-    ui.drawIcons(messageNbr);
-
-    if(preferences.get('display_notifications') === true && parseInt(messageNbr) > 0){
-      if(this.firstCheck){
-        if(messageNbr > 0){
-          ui.displayNotification({
-            title: 'Unread mails: ' + messageNbr,
-            text: _.reduce(categories, function(subject, categorie){
-              return subject += categorie.name + ': ' + categorie.counter.toString() + '\n\r';
-            }, '')
-          });
-        }
-      } else{
-        // Emails in inbox
-        let nonNotifiedInboxEmails = this.getNonNotifiedMails(unreadInboxMails);
-        // Emails in other folders
-        let nonNotifiedFoldersEmails = _.filter(categories, function(c){
-          return (!self.oldCategories[c.name] || self.oldCategories[c.name].counter < c.counter) && c.name !== self.inboxName;
-        }).map(function(c){
-          return {
-            counter: c.counter - (self.oldCategories[c.name] ? self.oldCategories[c.name].counter : 0),
-            name: c.name
-          };
-        }).filter(function(c){
-          return c.counter > 0;
-        });
-
-        if(nonNotifiedInboxEmails.length > 0){
-          ui.displayNotification({
-            title: 'New mails in Inbox',
-            text: _.pluck(nonNotifiedInboxEmails, 'subject')
-          });
-        }
-        if(nonNotifiedFoldersEmails.length > 0){
-          nonNotifiedFoldersEmails.forEach(function(c){
-            ui.displayNotification({
-              title: 'New mails (' + c.counter + ') in ' + c.name
-            });
-          });
-        }
-      }
-    }
-    if(unreadInboxMails.length > 0){
-      this.oldInboxEmails = unreadInboxMails;
-    }
-
-    this.oldCategories = categories;
-    this.firstCheck = false;
   };
 
-  this.getNonNotifiedMails = function(unreadInboxMails){
-    let ret = null;
-    if(this.oldInboxEmails.length > 0){
-      ret = _.reject(unreadInboxMails, function(mail){
-        return _.find(self.oldInboxEmails, function(old){
+  this.showFirstNotification = function(document, messageNbr, folders){
+    ui.displayNotification({
+      title: 'Unread mails: ' + messageNbr,
+      text: _.reduce(folders, function(subject, folder){
+        return subject += folder.name + ': ' + folder.counter.toString() + '\n\r';
+      }, '')
+    });
+  };
+
+  this.showNonNotifiedInboxEmailsNotification = function(nonNotifiedInboxEmails){
+    ui.displayNotification({
+      title: 'New mails in Inbox',
+      text: _.pluck(nonNotifiedInboxEmails, 'subject')
+    });
+  };
+
+  this.showNonNotifiedFoldersEmailsNotification = function(nonNotifiedFoldersEmails){
+    nonNotifiedFoldersEmails.forEach(function(c){
+      ui.displayNotification({
+        title: 'New mails (' + c.counter + ') in ' + c.name
+      });
+    });
+  };
+
+  this.getFolders = function(document){
+    let dontNotifyTheseFolders = preferences.get('ignore_folders').split(',');
+
+    return _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(folders, folder){
+      let name = folder.querySelector('span.editableLabel').innerHTML.trim();
+      let dontKeepFolder = _.find(dontNotifyTheseFolders, function(n){
+        return name === n.trim();
+      });
+      if(!dontKeepFolder){
+        folders[name] = {
+          counter: folder.querySelector('span.count').innerHTML.trim(),
+          name: name
+        };
+      }
+      return folders;
+    }, {});
+  };
+
+  this.getNonNotifiedMails = function(unreadInboxMails, oldInboxEmails){
+    if(oldInboxEmails.length > 0){
+      return _.reject(unreadInboxMails, function(mail){
+        return _.find(oldInboxEmails, function(old){
           return old.id === mail.id;
         });
       });
     } else{
-      ret = unreadInboxMails;
+      return unreadInboxMails;
     }
-    return ret;
+  };
+
+  this.getNonNotifiedFoldersEmails = function(folders, oldFolders, inboxName){
+    return _.filter(folders, function(c){
+      return (!oldFolders[c.name] || oldFolders[c.name].counter < c.counter) && c.name !== inboxName;
+    }).map(function(c){
+      return {
+        counter: c.counter - (self.oldCategories[c.name] ? self.oldCategories[c.name].counter : 0),
+        name: c.name
+      };
+    }).filter(function(c){
+      return c.counter > 0;
+    });
   };
 
   this.getUnreadInboxMails = function(document){
-    let mailsTables = document.querySelectorAll('ul.mailList.InboxTableBody'),
-    mailsTablesChilds = _.map(mailsTables, function(table){
+    const mailsTables = document.querySelectorAll('ul.mailList.InboxTableBody');
+    const mailsTablesChilds = _.map(mailsTables, function(table){
       return table.children;
-    }),
-    mailsIDs = [],
-    mailStrings = [];
+    });
+    let mailsIDs = [];
+    let mailStrings = [];
 
     let unreadInboxMails = _.flatten(_.map(mailsTablesChilds, function(nodeList){
       let mails = _.filter(nodeList, function(elem){
