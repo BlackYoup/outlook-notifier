@@ -49,6 +49,13 @@
       "description": "Specify for what folders you don't want to be notified (case sensitive and comma separated: my Folder 1, folder2, fôlder3)",
       "type": "string",
       "value": ""
+    },
+    {
+      "name": "ignore_all_folders",
+      "title": "Ignore all folders expect Inbox",
+      "description": "Ignore all folders except Inbox folder. Useful if you just want to be warned about Inbox mails",
+      "type": "bool",
+      "value": false
     }
   ]
 }

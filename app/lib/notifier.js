@@ -51,21 +51,10 @@ module.exports = function(){
       return;
     }
 
-    let dontNotifyTheseCategories = preferences.get('ignore_folders').split(',');
+    let excludeFolders = preferences.get('ignore_all_folders');
+    let htmlFolders = document.querySelectorAll('div.leftnav span.Unread.TextSemiBold');
 
-    let categories = _.reduce(document.querySelectorAll('div.leftnav span.Unread.TextSemiBold'), function(categories, categorie){
-      let name = categorie.querySelector('span.editableLabel').innerHTML.trim();
-      let dontKeepCategorie = _.find(dontNotifyTheseCategories, function(n){
-        return name === n.trim();
-      });
-      if(!dontKeepCategorie){
-        categories[name] = {
-          counter: categorie.querySelector('span.count').innerHTML.trim(),
-          name: name
-        };
-      }
-      return categories;
-    }, {});
+    let categories = _.reduce(excludeFolders ? [htmlFolders[0]] : htmlFolders, self.reduceCategories, {});
 
     let unreadInboxMails = this.getUnreadInboxMails(document);
     this.inboxName = this.inboxName || document.querySelector('.leftnavitem .editableLabel.readonly').innerHTML.trim();
@@ -167,6 +156,21 @@ module.exports = function(){
       });
     }));
     return unreadInboxMails;
+  };
+
+  this.reduceCategories = function(categories, categorie){
+    let dontNotifyTheseCategories = preferences.get('ignore_folders').split(',');
+    let name = categorie.querySelector('span.editableLabel').innerHTML.trim();
+    let dontKeepCategorie = _.find(dontNotifyTheseCategories, function(n){
+      return name === n.trim();
+    });
+    if(!dontKeepCategorie){
+      categories[name] = {
+        counter: categorie.querySelector('span.count').innerHTML.trim(),
+        name: name
+      };
+    }
+    return categories;
   };
 
   this.checkLogged = function(document){
