@@ -52,7 +52,7 @@
     },
     {
       "name": "ignore_all_folders",
-      "title": "Ignore all folders expect Inbox",
+      "title": "Ignore all folders except Inbox",
       "description": "Ignore all folders except Inbox folder. Useful if you just want to be warned about Inbox mails",
       "type": "bool",
       "value": false
